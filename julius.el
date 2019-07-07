@@ -1,12 +1,14 @@
-(defun my-observe ()
+(defvar observable-buffer-name "julius-emacs.log")
+
+(defun my-buffer-observe ()
   (let* ((current-buf (current-buffer)))
     (save-current-buffer
-      (set-buffer (get-buffer-create "julius-emacs.log"))
+      (set-buffer (get-buffer-create observable-buffer-name))
       (let* ((str (buffer-substring-no-properties (point-min) (point-max))))
-        (action current-buf str)
+        (julius-action current-buf str)
         (erase-buffer)))))
 
-(defun action (buf str)
+(defun julius-action (buf str)
   (save-current-buffer
     (set-buffer buf)
     (if (string-match "^コピー" str)
@@ -14,8 +16,11 @@
     (if (string-match "^貼り付け" str)
         (yank))))
 
-(setq my-observe-timer
-      (run-with-idle-timer
-       0.5 t 'my-observe))
+(defun start-my-buffer-observe ()
+  (interactive)
+  (setq my-buffer-observe-timer
+        (run-with-idle-timer 0.5 t 'my-buffer-observe)))
 
-(cancel-timer my-observe-timer)
+(defun stop-my-buffer-observe ()
+  ((interactive))
+  (cancel-timer my-buffer-observe-timer))
